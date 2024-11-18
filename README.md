@@ -28,6 +28,14 @@ docker start -i data-science-container
 
 ## ¿Cómo levantar la Aplicación?
 
+### Cuando es la primera vez que se levanta
+
 ```bash
 docker compose up --build
+```
+
+### Cuando ya se ha levantado al menos una vez
+
+```bash
+docker compose up
 ```
