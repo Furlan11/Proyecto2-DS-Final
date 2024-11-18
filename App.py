@@ -38,36 +38,53 @@ def predict_relationship(text, tokenizer, model, label_encoder):
     predicted_label = label_encoder.inverse_transform([predictions])[0]
     print(predicted_label)
     if '~' in predicted_label:
-        return predicted_label.split('~').append(prediction_time)
+        results = predicted_label.split('~')
+        results.append(prediction_time)
+        return results
     return [predicted_label, prediction_time]
 
 def main():
-    st.title("Relationship Prediction App")
+   
+    st.title("Determinación de relaciones entre entidades en artículos científicos")
 
-
+    st.write("Esta aplicación tiene principal objetivo determinar la relación entre dos entidades en un texto dado. De manera de que a partir de un abstract puede determinar sí existe una asociación, una correlación positiva, correlación negativa, comparación, unión, interacción de drogas, tratamiento en conjunto, conversión, de manera que le pueda brindar una idea al lector de qué es lo que se encontrará en el texto.")
     # Permite al usuario seleccionar el modelo
-    selected_model = st.selectbox("Select a model:", list(model_paths.keys()))
-
+    selected_model = st.selectbox("Selecciona un modelo:", list(model_paths.keys()))
+    
+    if selected_model == 'Model BERT 30 (Entity-Relationship)':
+        st.write("Este modelo se entrenó con 30 épocas y permite la predicción de clases de relaciones y entidades.\n Este modelo tiene un accuracy del 0.8090 con testeo y una pérdida del 0.5624.\n")
+        st.image('./images/acc_val_model_relationship_entity_30.png', use_container_width=True, caption='Accuracy y pérdida del modelo BERT 30 (Entity-Relationship)')
+    elif selected_model == 'Model BERT 30 (Relationship)':
+        st.write("Este modelo se entrenó con 30 épocas y permite la predicción de clases de relaciones, pero no de entidades.\n Este modelo tiene un accuracy del 0.8620 con testeo y una pérdida del 0.3722\n")
+        st.image('./images/acc_val_model_relationship1.png', use_container_width=True, caption='Accuracy y pérdida del modelo BERT 30 (Relationship)')
+        st.image('./images/cm_test_set_model_relationship.png', use_container_width=True, caption='Matriz de confusión de las clases del modelo BERT 30 (Relationship)')
+        st.image('./images/cm_test_set_model_relationship1.png', use_container_width=True, caption='Matriz de confusión de las clases del modelo BERT 30 (Relationship)')
+        st.image('./images/most_predicted_classes_model_relationship.png', use_container_width=True, caption='Top clases más predichas del modelo BERT 30 (Relationship)')
+    elif selected_model == 'Model BERT 10 (Entity-Relationship)':
+        st.write("Este modelo se entrenó con 10 épocas y permite la predicción de clases de relaciones y entidades.\n Este modelo tiene un accuracy del 0.7789 con testeo y una pérdida del 0.7237.\n")
+        st.image('./images/acc_val_model_relationship_entity.png', use_container_width=True, caption='Accuracy y pérdida del modelo BERT 10 (Entity-Relationship)')
+        st.image('./images/cm_test_set_model_relationship_entity.png', use_container_width=True, caption='Matriz de confusión de las clases del modelo BERT 10 (Entity-Relationship)')
+        st.image('./images/most_predicted_classes_model_relationship_entity.png', use_container_width=True, caption='Top clases más predichas del modelo BERT 10 (Entity-Relationship)')
     # Carga el modelo y el tokenizador seleccionados
     model_path = model_paths[selected_model]
     model, tokenizer, label_encoder = fun_to_load_models(model_path)
 
     # Entrada de texto por parte del usuario
-    user_input = st.text_area("Enter text for prediction:")
+    user_input = st.text_area("Ingresa un abstract o un texto científico para realizar la predicción:")
 
-    if st.button("Predict"):
+    if st.button("Predicción"):
         if user_input:
             prediction = predict_relationship(text=user_input, model=model, tokenizer=tokenizer, label_encoder=label_encoder)
             if len(prediction) > 2:
-                st.success(f"Predicted Relationship: {prediction[1]}")
-                st.success(f"Entity 1: {prediction[0]}")
-                st.success(f"Entity 2: {prediction[2]}")
-                st.success(f"Prediction Time: {prediction[3]}")
+                st.success(f"Relación predicha: {prediction[1]}")
+                st.success(f"Entidad 1: {prediction[0]}")
+                st.success(f"Entidad 2: {prediction[2]}")
+                st.success(f"Tiempo de predicción: {prediction[3]} segundos")
             else:
-                st.success(f"Predicted Relationship: {prediction[0]}")
-                st.success(f"Prediction Time: {prediction[1]} seconds")
+                st.success(f"Relación predicha: {prediction[0]}")
+                st.success(f"Tiempo de predicción: {prediction[1]} segundos")
         else:
-            st.warning("Please enter text to make a prediction.")
+            st.warning("Por favor, ingresa un texto para realizar una predicción.")
             
 if __name__ == "__main__":
     main()
