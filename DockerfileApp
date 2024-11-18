@@ -1,17 +1,19 @@
 FROM diggspapu/data-science-environment:latest
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /app
 
-# Install required packages
+# Install required packages, including `watchdog`
 RUN pip install streamlit streamlit_jupyter watchdog
 
-# Set the Streamlit configuration to enable `watchdog` explicitly
+# Set Streamlit to use `watchdog` for file watching
 ENV STREAMLIT_SERVER_FILE_WATCHER_TYPE=watchdog
-# Copy the rest of the application's source code to the container
+
+# Copy the source code
 COPY . .
-# Expose the port for the APP
+
+# Expose the required port
 EXPOSE 8501
 
-# Run the application
+# Run the Streamlit app
 CMD ["streamlit", "run", "App.py", "--server.enableCORS=false"]
