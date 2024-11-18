@@ -3,3 +3,5 @@ merged.csv
 /.ipynb_checkpoints/
 /logs/
 /results/
+/models/
+/.streamlit/

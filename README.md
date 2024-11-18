@@ -25,3 +25,9 @@ docker run --gpus all -p 8811:8811 -v "$(pwd):/app" --name data-science-containe
 ```bash
 docker start -i data-science-container
 ```
+
+## ¿Cómo levantar la Aplicación?
+
+```bash
+docker compose up --build
+```
