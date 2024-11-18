@@ -1,0 +1,9 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: DockerfileApp
+    ports:
+      - "8501:8501"
+    environment:
+      - ENV_VAR=example

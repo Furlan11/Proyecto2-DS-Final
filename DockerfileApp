@@ -1,10 +1,17 @@
 FROM diggspapu/data-science-environment:latest
 
+# Set the working directory in the container
+WORKDIR /app
+
+# Install required packages
+RUN pip install streamlit streamlit_jupyter watchdog
+
+# Set the Streamlit configuration to enable `watchdog` explicitly
+ENV STREAMLIT_SERVER_FILE_WATCHER_TYPE=watchdog
 # Copy the rest of the application's source code to the container
 COPY . .
+# Expose the port for the APP
+EXPOSE 8501
 
-# Expose the port for Jupyter Notebook
-EXPOSE 8811
-
-# Command to run Jupyter Notebook and keep the container running
-CMD ["sh", "-c", "jupyter notebook --ip=0.0.0.0 --port=8811 --no-browser --allow-root && tail -f /dev/null"]
+# Run the application
+CMD ["streamlit", "run", "App.py", "--server.enableCORS=false"]

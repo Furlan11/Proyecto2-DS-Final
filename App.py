@@ -1,22 +1,45 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
+import torch
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-# Título de la aplicación
-st.title("Mi primera aplicación de Streamlit")
+# Load the model, tokenizer, and label encoder
+model_path = './relationship_model'
+model = AutoModelForSequenceClassification.from_pretrained(model_path)
+tokenizer = AutoTokenizer.from_pretrained(model_path)
+label_encoder = pd.read_pickle(f'{model_path}/label_encoder.pkl')
 
-# Subtítulo o descripción
-st.write("Esta es una aplicación sencilla de ejemplo")
+def predict_relationship(text):
+    # Tokenize the input text
+    inputs = tokenizer(text, return_tensors='pt', truncation=True, padding=True)
 
-# Generar algunos datos de muestra
-data = pd.DataFrame(
-    np.random.randn(100, 2),
-    columns=['Columna 1', 'Columna 2']
-)
+    # Make prediction
+    with torch.no_grad():
+        outputs = model(**inputs)
 
-# Mostrar el dataframe
-st.write("Aquí hay un DataFrame aleatorio:")
-st.dataframe(data)
+    # Get predicted class index
+    predictions = torch.argmax(outputs.logits, dim=1).item()
+    print(predictions)
+    # Decode the predicted class
+    predicted_label = label_encoder.inverse_transform([predictions])[0]
+    print(label_encoder.inverse_transform([predictions]))
+    return predicted_label.split('~')
 
-# Mostrar un gráfico
-st.line_chart(data)
+# Streamlit UI
+def main():
+    st.title("Relationship Prediction App")
+
+    # Input text from user
+    user_input = st.text_area("Enter text for prediction:")
+
+    if st.button("Predict"):
+        if user_input:
+            prediction = predict_relationship(user_input)
+            st.success(f"Predicted Relationship: {prediction[1]}")
+            st.success(f"Entity 1: {prediction[0]}")
+            st.success(f"Entity 2: {prediction[2]}")
+        else:
+            st.warning("Please enter text to make a prediction.")
+
+if __name__ == "__main__":
+    main()
